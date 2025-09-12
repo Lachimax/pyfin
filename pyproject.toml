@@ -1,0 +1,18 @@
+#[build-system]
+#requires = ["flit_core >=3.2,<4"]
+#build-backend = "flit_core.buildapi"
+
+[project]
+name = "finance"
+authors = [{ name = "Lachlan Marnoch", email = "lachlan.marnoch@gmail.com" }]
+version = "0.1"
+requires-python = ">=3.11"
+dependencies = [
+    "astropy",
+    "numpy",
+]
+license = { file = "LICENSE.md" }
+description = "."
+readme = "README.md"
+# [project.scripts]
+# template_script = "template_script:parse_args"
