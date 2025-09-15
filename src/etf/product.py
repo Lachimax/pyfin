@@ -1,5 +1,10 @@
 import utils as u
+from astropy import units
 from ..generic import Generic
 
 class ETFProduct(Generic):
-    pass
+    params = {
+        "code": None,
+        "suggested_term": 3 * units.yr,
+        "predicted_annual_growth": 0.06
+    }
