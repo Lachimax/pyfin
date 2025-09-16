@@ -1,6 +1,6 @@
-import utils as u
+import pyfin.utils as u
 from astropy import units
-from ..generic import Generic
+from pyfin.generic import Generic
 
 class ETFProduct(Generic):
     params = {

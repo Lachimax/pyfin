@@ -1,4 +1,4 @@
-from ..generic import Generic
+from pyfin.generic import Generic
 
 class ETFUnit(Generic):
     params = {
