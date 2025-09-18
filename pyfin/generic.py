@@ -3,6 +3,7 @@ import pyfin.utils as u
 
 class Generic():
     params = {
+        "id": None,
         "name": None
     }
     def __init__(
@@ -15,9 +16,14 @@ class Generic():
             setattr(self, key, item)
         for key, item in kwargs.items():
             setattr(self, key, item)
+        if self.id is None:
+            self.set_id()
         # Default to name of object as filename if a directory is provided as path
         if self.path is not None and os.path.isdir(self.path) and self.name is not None:
-            self.path = os.path.join(self.path, self.name + ".yaml")
+            self.path = os.path.join(self.path, self.name + self.id + ".yaml")
+
+    def to_dict(self):
+        return self.__dict__.copy()
 
     def to_file(self, path: str = None, set_path=True):
         """Writes object properties to a YAML file.
@@ -36,12 +42,30 @@ class Generic():
                 path = self.path
         elif set_path:
             self.path = path
-        dictionary=self.__dict__.copy()
+        dictionary = self.to_dict()
         dictionary.pop("path")
         u.write_yaml(
             file=path,
             dictionary=dictionary
         )
+
+    
+    def set_id(self, idn: str = None, **kwargs) -> str:
+        """Set ID of object.
+
+        Args:
+            idn (str, optional): _description_. Defaults to None.
+
+        Returns:
+            str: ID as set.
+        """
+        if idn is None:
+            idn = self.generate_id(**kwargs)
+        self.id = idn
+        return idn
+
+    def generate_id(self, **kwargs):
+        return u.generate_id(**kwargs)
 
     @classmethod
     def from_file(cls, file: str):
@@ -61,6 +85,6 @@ class Generic():
         """Saves a template YAML file in the format for creating this object.
 
         Args:
-            path (str): Path to save to. Defaults to 
+            path (str): Path to save to. Defaults to './template.yaml'
         """
         u.write_yaml(path, cls.params)
