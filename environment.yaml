@@ -1,4 +1,4 @@
-name: finance
+name: pyfin
 channels:
   - defaults
   - astropy

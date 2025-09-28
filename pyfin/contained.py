@@ -1,11 +1,16 @@
+import astropy.units as u
+
 from .container import Container
 from .generic import Generic
 
 class Contained(Generic):
     _container_key = "container"
+    container_class = Container
     def __init__(self, path = None, **kwargs):
         self.container: Container = None
         super().__init__(path, **kwargs)
+        if self.container is None:
+            self.container = self.container_class()
 
     def generate_id(self):
         n = 0
@@ -23,6 +28,3 @@ class Contained(Generic):
         dictionary[self._container_key] = self.container.id
         dictionary.pop(self._container_key)
         return dictionary
-    
-    def step(self):
-        pass
