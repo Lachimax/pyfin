@@ -41,10 +41,11 @@ class Simulation(Container):
         n = 0
         self.date = self.start_date.copy()
         while self.date < end_date:
-            self.step()
-            elapsed = self.date - self.start_date
+            elapsed = (self.date - self.start_date).to(u.s)
             self.message(f"{n}: {self.date}, {relevant_timescale(elapsed)} elapsed.")
-            self.date += step_size
+            self.step()
+            n += 1
+            self.date += self.step_size
 
     def _steps_per_year(self):
         return u.yr / self.step_size

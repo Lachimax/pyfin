@@ -29,9 +29,9 @@ class Generic():
     def to_dict(self):
         return self.__dict__.copy()
 
-    def message(self, **args):
+    def message(self, *args):
         if self.verbose:
-            print(**args)
+            print(*args)
 
     def to_file(self, path: str = None, set_path=True):
         """Writes object properties to a YAML file.

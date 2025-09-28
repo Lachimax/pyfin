@@ -1,5 +1,8 @@
+import numpy as np
+
 from astropy import units as u
 from astropy import time as t
+
 from pyfin.simulated import Simulated
 from .unit import ETFUnit
 from pyfin.portfolio import Portfolio
@@ -48,14 +51,17 @@ class ETFProduct(Simulated):
             date: u.Quantity = None,
     ):
         step_props = super().step(step_size)
-        growth_factor = self.product.predicted_annual_growth / self.container.steps_per_year
-        delta = self.value * growth_factor
-        self.value += delta
-        self.message(f"\t{self.id}: Value changes by {delta}, -> {self.value}")
+        growth_factor = self.predicted_annual_growth / self.container.steps_per_year
+        delta = np.round((self.value * growth_factor).decompose(), 2)
+        old_value = self.value
+        self.value = np.round(self.value + delta, 2)
+        self.message(f"\t{self.id}: Value changes by {delta}, {old_value} -> {self.value}")
         step_props["value"] = self.value
         step_props["value_change"] = delta
         self.record[step_props["date"]] = step_props
         return step_props
 
     def new_unit(self, purchased: t.Time):
-        return ETFUnit(product=self, purchased=purchased, container=self.container)
+        unit = ETFUnit(product=self, purchased=purchased, container=self.container)
+        self.container.add_item(unit)
+        return unit

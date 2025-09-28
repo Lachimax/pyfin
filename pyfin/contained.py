@@ -10,7 +10,8 @@ class Contained(Generic):
         self.container: Container = None
         super().__init__(path, **kwargs)
         if self.container is None:
-            self.container = self.container_class()
+            c = self.container_class()
+            c.add_item(self)
 
     def generate_id(self):
         n = 0

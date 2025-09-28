@@ -1,6 +1,6 @@
 from pyfin.contained import Contained
 from pyfin.portfolio import Portfolio
-
+# from .product import ETFProduct
 
 class ETFUnit(Contained):
     params = {

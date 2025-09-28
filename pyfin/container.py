@@ -33,4 +33,4 @@ class Container(Generic):
         return self._registry[name]
 
     def __setitem__(self, name, value):
-        return super().__setattr__(name, value)
+        self._registry[name] = value
