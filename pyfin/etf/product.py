@@ -5,7 +5,6 @@ from astropy import time as t
 
 from pyfin.simulated import Simulated
 from .unit import ETFUnit
-from pyfin.portfolio import Portfolio
 
 
 class ETFProduct(Simulated):
@@ -15,10 +14,11 @@ class ETFProduct(Simulated):
         "suggested_term": 3 * u.yr,
         "predicted_annual_growth": 0.06,
         "starting_value": 0.,
-        "start_date": t.Time("2025-09-25")
+        "start_date": t.Time.now()
     }
+    _container_key = "portfolio"
     date_keys = ["start_date"]
-    container_class = Portfolio
+
     def __init__(self, path, **kwargs):
         super().__init__(path, **kwargs)
         self.value: float = self.starting_value * 1.
@@ -65,3 +65,8 @@ class ETFProduct(Simulated):
         unit = ETFUnit(product=self, purchased=purchased, container=self.container)
         self.container.add_item(unit)
         return unit
+
+    @classmethod
+    def _container_class(cls):
+        from pyfin.portfolio import Portfolio
+        return Portfolio

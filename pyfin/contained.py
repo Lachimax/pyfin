@@ -5,13 +5,13 @@ from .generic import Generic
 
 class Contained(Generic):
     _container_key = "container"
-    container_class = Container
     def __init__(self, path = None, **kwargs):
         self.container: Container = None
         super().__init__(path, **kwargs)
         if self.container is None:
-            c = self.container_class()
-            c.add_item(self)
+            cls = self._container_class()
+            container = cls()
+            container.add_item(self)
 
     def generate_id(self):
         n = 0
@@ -29,3 +29,8 @@ class Contained(Generic):
         dictionary[self._container_key] = self.container.id
         dictionary.pop(self._container_key)
         return dictionary
+    
+    @classmethod
+    def _container_class(cls):
+        return Container
+        

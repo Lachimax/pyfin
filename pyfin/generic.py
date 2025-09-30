@@ -99,7 +99,7 @@ class Generic():
         return cls.params.copy()
 
     @classmethod
-    def template_yaml(cls, path: str = "./template.yaml"):
+    def template_yaml(cls, path: str = "./template.yaml", **kwargs):
         """Saves a template YAML file in the format for creating this object.
 
         Args:
@@ -109,4 +109,5 @@ class Generic():
         for k in cls.date_keys:
             if k in params:
                 params[k] = str(params[k])
+        params.update(kwargs)
         u.write_yaml(path, params)

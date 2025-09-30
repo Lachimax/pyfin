@@ -15,6 +15,8 @@ class Simulation(Container):
         self.start_date: t.Time = None
         self.end_date: t.Time = None
         self.steps_per_year: float = self._steps_per_year()
+        self.output_dir: str = None
+        self.input_dir: str = None
 
     def simulate(
             self,

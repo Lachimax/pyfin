@@ -1,6 +1,4 @@
 from pyfin.contained import Contained
-from pyfin.portfolio import Portfolio
-# from .product import ETFProduct
 
 class ETFUnit(Contained):
     params = {
@@ -9,7 +7,6 @@ class ETFUnit(Contained):
     }
     date_keys = ["purchased"]
     _container_key = "portfolio"
-    container_class = Portfolio
     def __init__(
             self, 
             path = None, 
@@ -34,3 +31,7 @@ class ETFUnit(Contained):
     def _generate_id(self, n):
         return f"{self.product.code}_{self.purchased}_{n}"
         
+    @classmethod
+    def _container_class(cls):
+        from pyfin.portfolio import Portfolio
+        return Portfolio

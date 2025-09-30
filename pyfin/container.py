@@ -1,3 +1,8 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .contained import Contained
+
 import astropy.units as u
 
 from .generic import Generic
@@ -13,7 +18,7 @@ class Container(Generic):
         self._registry = {}
         super().__init__(path, **kwargs)
 
-    def add_item(self, item: 'Contained'):
+    def add_item(self, item: Contained):
         item.set_id()
         self[item.id] = item
         item.container = self

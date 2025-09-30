@@ -3,7 +3,7 @@
 #build-backend = "flit_core.buildapi"
 
 [project]
-name = "finance"
+name = "pyfin"
 authors = [{ name = "Lachlan Marnoch", email = "lachlan.marnoch@gmail.com" }]
 version = "0.1"
 requires-python = ">=3.11"
@@ -14,5 +14,5 @@ dependencies = [
 license = { file = "LICENSE.md" }
 description = "."
 readme = "README.md"
-# [project.scripts]
-# template_script = "template_script:parse_args"
+[project.scripts]
+new_etf_product = "pyfin.bin.new_etf_product:parse_args"
