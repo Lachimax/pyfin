@@ -13,15 +13,18 @@ import os
 
 def main(
         output_dir: str,
+        name: str
 ):
-    Portfolio.template_yaml()
+    directory = os.path.join(output_dir, "portfolios", name)
+    os.makedirs(directory, exist_ok=True)
+    Portfolio.template_yaml(os.path.join(directory, f"{name}.yaml"), product=name)
     
 
 def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Template script."
+        description="Create input yaml for a Portfolio simulation."
     )
     parser.add_argument(
         "-o",
@@ -29,11 +32,18 @@ def parse_args():
         type=str,
         default="."
     )
+    parser.add_argument(
+        '-n',
+        help='Name for sim.',
+        type=str,
+        default="template"
+    )
 
     args = parser.parse_args()
     output_path = args.o
     main(
         output_dir=output_path,
+        name=args.n
     )    
 
 

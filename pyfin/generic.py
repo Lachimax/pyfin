@@ -106,6 +106,7 @@ class Generic():
             path (str): Path to save to. Defaults to './template.yaml'
         """
         params = cls._to_dict()
+        # Turn dates into strings for readability
         for k in cls.date_keys:
             if k in params:
                 params[k] = str(params[k])

@@ -6,7 +6,7 @@ class ETFUnit(Contained):
         "purchased": None,
     }
     date_keys = ["purchased"]
-    _container_key = "portfolio"
+    _container_key = "product"
     def __init__(
             self, 
             path = None, 

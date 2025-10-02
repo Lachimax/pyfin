@@ -16,3 +16,4 @@ description = "."
 readme = "README.md"
 [project.scripts]
 new_etf_product = "pyfin.bin.new_etf_product:parse_args"
+new_sim = "pyfin.bin.new_sim:parse_args"
