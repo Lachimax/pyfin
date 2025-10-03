@@ -7,6 +7,7 @@ class ETFUnit(Contained):
         "price": None
     }
     date_keys = ["purchased"]
+    money_keys = ["price"]
     _container_key = "product"
     def __init__(
             self, 

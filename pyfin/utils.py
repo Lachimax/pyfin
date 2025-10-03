@@ -7,6 +7,10 @@ import astropy.units as u
 from astropy.time import Time
 import astropy.io.misc.yaml as yaml
 
+dollar = u.def_unit('$')
+cent = u.def_unit('c', 0.01 * dollar)
+u.add_enabled_units([dollar, cent])
+
 def generate_id(length: int = 10):
     """Generate a random string to act as a unique ID. Does not check for uniqueness; this should be implemented in the class using this function. 
 

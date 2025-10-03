@@ -1,6 +1,9 @@
 import os
+
 import astropy.time as t
-import pyfin.utils as u
+import astropy.units as u
+
+from pyfin import utils
 
 class Generic():
     params = {
@@ -8,6 +11,7 @@ class Generic():
         "name": None
     }
     date_keys = []
+    money_keys = []
     def __init__(
             self,
             path: str = None,
@@ -55,7 +59,7 @@ class Generic():
             if k in dictionary:
                 dictionary[k] = str(dictionary[k])
         dictionary.pop("path")
-        u.write_yaml(
+        utils.write_yaml(
             file=path,
             dictionary=dictionary
         )
@@ -76,7 +80,7 @@ class Generic():
         return idn
 
     def generate_id(self, **kwargs):
-        return u.generate_id(**kwargs)
+        return utils.generate_id(**kwargs)
 
     @classmethod
     def from_file(cls, file: str, **kwargs):
@@ -88,10 +92,15 @@ class Generic():
         Returns:
             Generic: object created from the file.
         """
-        params = u.read_yaml(file=file)
+        params = utils.read_yaml(file=file)
         for k in cls.date_keys:
             if k in params:
                 params[k] = t.Time(params[k])
+        for k in cls.money_keys:
+            if k in params:
+                v = params[k]
+                if not isinstance(v, u.Quantity):
+                    params[k] = v * utils.dollar
         params.update(kwargs)
         return cls(path=file, **params)
 
@@ -112,4 +121,4 @@ class Generic():
             if k in params:
                 params[k] = str(params[k])
         params.update(kwargs)
-        u.write_yaml(path, params)
+        utils.write_yaml(path, params)

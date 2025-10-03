@@ -21,7 +21,7 @@ class Portfolio(Simulation):
         product_directory = os.path.join(self.input_dir, "etf", "products")
         for file in os.listdir(product_directory):
             path = os.path.join(product_directory, file)
-            if os.path.isfile(path):
+            if os.path.isfile(path) and "template" not in file:
                 etf_product = ETFProduct.from_file(path)
                 self.add_item(etf_product)
         unit_directory = os.path.join(self.input_dir, "etf", "units")
@@ -29,7 +29,7 @@ class Portfolio(Simulation):
             directory = os.path.join(unit_directory, product_name)
             for file in os.listdir(directory): # Unit files
                 path = os.path.join(unit_directory, file)
-                if os.path.isfile(path):
+                if os.path.isfile(path) and "template" not in file:
                     etf_product = self[product_name]
                     etf_unit = ETFUnit.from_file(path)
                     etf_product.add_item(etf_unit)

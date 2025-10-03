@@ -11,8 +11,7 @@ class Simulated(Contained):
 
     def step(
             self,
-            step_size: u.Quantity = 1 * u.fortnight,
-            date: u.Quantity = None,
+            step_size: u.Quantity = 1 * u.day,
     ):
         step_props = {}
         if self.container is None:

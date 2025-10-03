@@ -3,6 +3,7 @@ import numpy as np
 from astropy import units as u
 from astropy import time as t
 
+from pyfin.utils import dollar
 from pyfin.simulated import Simulated
 from pyfin.container import Container
 from .unit import ETFUnit
@@ -14,11 +15,13 @@ class ETFProduct(Simulated, Container):
         "provider": "Vanguard",
         "suggested_term": 3 * u.yr,
         "predicted_annual_growth": 0.06,
-        "starting_value": 0.,
-        "start_date": t.Time.now()
+        "starting_value": 50. * dollar,
+        "start_date": t.Time.now(),
+        "management_fee": 0.0027
     }
     _container_key = "portfolio"
     date_keys = ["start_date"]
+    money_keys = ["starting_value"]
 
     def __init__(self, path, **kwargs):
         super().__init__(path, **kwargs)
@@ -44,23 +47,43 @@ class ETFProduct(Simulated, Container):
             delta = date - latest
             delta = delta.to(u.yr)
             last_value = self.record[latest]["value"]
-            return last_value * (1. + self.predicted_annual_growth) ** delta.value
+            new_value, _ = self.predict_growth(delta_time=delta, initial_value=last_value)
+            return new_value
+
+    def predict_growth(
+            self,
+            delta_time: u.Quantity,
+            initial_value: float = None
+    ):
+        if initial_value is None:
+            initial_value = self.value
+        # Calculate growth
+        new_value = initial_value * (1 + self.predicted_annual_growth) ** (delta_time / u.yr)
+        # Calculate management fee
+        fee = ((1 - self.management_fee) ** (delta_time / u.yr) - 1) * new_value
+        new_value = new_value - fee
+        return new_value, fee
+
 
     def step(
             self,
             step_size: u.Quantity = 1 * u.fortnight,
-            date: u.Quantity = None,
     ):
         step_props = super().step(step_size)
-        growth_factor = self.predicted_annual_growth / self.container.steps_per_year
-        delta = np.round((self.value * growth_factor).decompose(), 2)
-        old_value = self.value
-        self.value = np.round(self.value + delta, 2)
-        self.message(f"\t{self.id}: Value changes by {delta}, {old_value} -> {self.value}")
+        new_value, fee = self.predict_growth(delta_time=step_size)
+        old_value = self.value * 1.
+        self.value = new_value
+        # print(new_value, old_value)
+        delta_value = new_value - old_value
+        self.message(f"\t{self.id}: Value changes by {delta_value} (fees {fee}), {old_value.round(2)} -> {self.value.round(2)}")
         step_props["value"] = self.value
-        step_props["value_change"] = delta
-        self.record[step_props["date"]] = step_props
+        step_props["value_change"] = delta_value
+        date = step_props.pop("date")
+        self.add_record(date=date, **step_props)
         return step_props
+
+    def add_record(self, date: t.Time, **kwargs):
+        self.record[date] = kwargs
 
     def new_unit(self, purchased: t.Time):
         unit = ETFUnit(product=self, purchased=purchased, container=self.container)
@@ -71,3 +94,9 @@ class ETFProduct(Simulated, Container):
     def _container_class(cls):
         from pyfin.portfolio import Portfolio
         return Portfolio
+    
+    def add_item(self, item):
+        if item.price is not None and item.purchased is not None:
+            self.add_record(date=item.purchased, value=item.price)
+        super().add_item(item)
+        

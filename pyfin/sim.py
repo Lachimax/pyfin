@@ -10,7 +10,7 @@ from .utils import relevant_timescale
 
 class Simulation(Container):
     def __init__(self, path=None, **kwargs):
-        self.step_size = 1 * u.fortnight
+        self.step_size = 1 * u.day
         self.date: t.Time = None
         self.start_date: t.Time = None
         self.end_date: t.Time = None
@@ -25,7 +25,7 @@ class Simulation(Container):
             self,
             start_date: t.Time = None,
             end_date: t.Time = None,
-            length: u.Quantity = 50 * u.yr,
+            length: u.Quantity = 10 * u.yr,
             step_size: u.Quantity = None,
             verbose: bool = None,
     ):
@@ -43,11 +43,11 @@ class Simulation(Container):
                 end_date = start_date + length
         self.end_date = end_date
         self.steps_per_year = self._steps_per_year()
-        n = 0
-        self.date = self.start_date.copy()
+        n = 1
+        self.date = self.start_date.copy() + 1 * u.day
         while self.date < end_date:
             elapsed = (self.date - self.start_date).to(u.s)
-            self.message(f"{n}: {self.date}, {relevant_timescale(elapsed)} elapsed.")
+            self.message(f"{n}: {self.date}, {relevant_timescale(elapsed).round(2)} elapsed.")
             self.step()
             n += 1
             self.date += self.step_size
@@ -58,4 +58,4 @@ class Simulation(Container):
     def step(self):
         for idn, obj in self._registry.items():
             if isinstance(obj, Simulated):
-                obj.step()
+                obj.step(step_size=self.step_size)
