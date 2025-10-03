@@ -79,7 +79,7 @@ class Generic():
         return u.generate_id(**kwargs)
 
     @classmethod
-    def from_file(cls, file: str):
+    def from_file(cls, file: str, **kwargs):
         """Reads in an object from a YAML file.
 
         Args:
@@ -92,6 +92,7 @@ class Generic():
         for k in cls.date_keys:
             if k in params:
                 params[k] = t.Time(params[k])
+        params.update(kwargs)
         return cls(path=file, **params)
 
     @classmethod

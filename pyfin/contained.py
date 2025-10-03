@@ -8,10 +8,6 @@ class Contained(Generic):
     def __init__(self, path = None, **kwargs):
         self.container: Container = None
         super().__init__(path, **kwargs)
-        if self.container is None:
-            cls = self._container_class()
-            container = cls()
-            container.add_item(self)
 
     def generate_id(self):
         n = 0
@@ -20,6 +16,12 @@ class Contained(Generic):
             n += 1
             identifier = self._generate_id(n)
         return identifier
+    
+    def check_container(self):
+        if not isinstance(self.container, Container):
+            cls = self._container_class()
+            container = cls()
+            container.add_item(self)
 
     def _generate_id(self, n):
         return f"{self.name}_{n}"

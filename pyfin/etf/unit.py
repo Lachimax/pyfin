@@ -4,6 +4,7 @@ class ETFUnit(Contained):
     params = {
         "product": None,
         "purchased": None,
+        "price": None
     }
     date_keys = ["purchased"]
     _container_key = "product"
@@ -17,7 +18,11 @@ class ETFUnit(Contained):
             raise ValueError("No product declared for ETFUnit")
 
     def purchased_for(self):
-        return self.product.value_at_date(self.purchased)
+        if self.price is None:
+            price = self.product.value_at_date(self.purchased)
+        else:
+            price = self.price
+        return price
 
     def maturation(self):
         return self.purchased + self.product.suggested_term

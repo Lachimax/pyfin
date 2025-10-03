@@ -4,10 +4,11 @@ from astropy import units as u
 from astropy import time as t
 
 from pyfin.simulated import Simulated
+from pyfin.container import Container
 from .unit import ETFUnit
 
 
-class ETFProduct(Simulated):
+class ETFProduct(Simulated, Container):
     params = {
         "code": "",
         "provider": "Vanguard",

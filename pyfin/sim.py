@@ -1,5 +1,6 @@
-import astropy.units as u
+import os
 
+import astropy.units as u
 import astropy.time as t
 
 from .container import Container
@@ -9,7 +10,6 @@ from .utils import relevant_timescale
 
 class Simulation(Container):
     def __init__(self, path=None, **kwargs):
-        super().__init__(path, **kwargs)
         self.step_size = 1 * u.fortnight
         self.date: t.Time = None
         self.start_date: t.Time = None
@@ -17,6 +17,9 @@ class Simulation(Container):
         self.steps_per_year: float = self._steps_per_year()
         self.output_dir: str = None
         self.input_dir: str = None
+        super().__init__(path, **kwargs)
+        if self.input_dir is None:
+            self.input_dir = os.path.dirname(self.path)
 
     def simulate(
             self,
