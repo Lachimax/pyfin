@@ -29,7 +29,7 @@ class Contained(Generic):
     def to_dict(self):
         dictionary = super().to_dict()
         dictionary[self._container_key] = self.container.id
-        dictionary.pop(self._container_key)
+        dictionary.pop("container")
         return dictionary
     
     @classmethod

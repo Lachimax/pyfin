@@ -15,27 +15,27 @@ class ETFUnit(Contained):
             **kwargs
         ):
         super().__init__(path, **kwargs)
-        if self.product is None:
+        if self.container is None:
             raise ValueError("No product declared for ETFUnit")
 
     def purchased_for(self):
         if self.price is None:
-            price = self.product.value_at_date(self.purchased)
+            price = self.container.value_at_date(self.purchased)
         else:
             price = self.price
         return price
 
     def maturation(self):
-        return self.purchased + self.product.suggested_term
+        return self.purchased + self.container.suggested_term
 
     def value_at_maturation(self):
-        return self.product.value_at_date(self.maturation())
+        return self.container.value_at_date(self.maturation())
 
     def return_at_maturation(self):
         return self.value_at_maturation() - self.purchased_for()
 
     def _generate_id(self, n):
-        return f"{self.product.code}_{self.purchased}_{n}"
+        return f"{self.container.code}_{self.purchased}_{n}"
         
     @classmethod
     def _container_class(cls):

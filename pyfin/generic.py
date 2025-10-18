@@ -59,6 +59,7 @@ class Generic():
             if k in dictionary:
                 dictionary[k] = str(dictionary[k])
         dictionary.pop("path")
+        print(dictionary)
         utils.write_yaml(
             file=path,
             dictionary=dictionary

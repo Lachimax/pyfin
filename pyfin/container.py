@@ -34,6 +34,9 @@ class Container(Generic):
         """
         return idn in self._registry
 
+    def list_items(self):
+        return list(sorted(self._registry.keys()))
+
     def __getitem__(self, name):
         return self._registry[name]
 
