@@ -4,11 +4,13 @@ from typing import TYPE_CHECKING
 import os
 
 from astropy import units, time
+from astropy.table import QTable
 
 from .sim import Simulation
 from pyfin.etf.product import ETFProduct
 from pyfin.etf.unit import ETFUnit
 from pyfin import utils
+from astropy.table import vstack
 if TYPE_CHECKING:
     from pyfin.container import Container
 
@@ -39,6 +41,8 @@ class Portfolio(Simulation):
                     etf_unit = ETFUnit.from_file(path, container=etf_product)
                     etf_product.add_item(etf_unit)
 
+        print()
+
 
     def write_etfs(self):
         for key, product in self._registry.items():
@@ -46,27 +50,60 @@ class Portfolio(Simulation):
                 unit.to_file()
 
 
-    def add_etf_unit_ui(self):
-        _, product = utils.select_option(
-            message="Select a product:",
-            options=self.list_items(),
-        )
-        product = self[product]
+    def add_etf_units_ui(self):
         purchased = utils.enter_time(
-            message="Enter date purchased:"
+            message="Enter date of transaction:"
         )
-        price = utils.user_input(
-            message="Enter price:",
-            input_type=float
-        )
-        etf_unit = ETFUnit(
-            container=product,
-            purchased=purchased,
-            price=price * utils.dollar
-        )
-        if isinstance(self.path, str):
-            etf_unit.path = os.path.join(self.unit_directory, product.id, etf_unit.id + ".yaml")
-            
-        product.add_item(etf_unit)
-        
+        added = []
+        cont = True
+        while cont:
+            _, product_name = utils.select_option(
+                message="Select a product:",
+                options=self.list_items(),
+            )
+            product = self[product_name]
+            price = utils.user_input(
+                message=f"Enter unit price of {product_name}:",
+                input_type=float
+            )
+            n = utils.user_input(
+                message=f"How many {product_name} units were purchased in this transaction?",
+                input_type=int
+            )
+            i = 0
+            while i < n:
+                etf_unit = ETFUnit(
+                    container=product,
+                    purchased=purchased,
+                    price=price * utils.dollar
+                )
+                i += 1
+                product.add_item(etf_unit)
+                added.append(product_name)
+            added.sort()
+            for p in added:
+                print(p)
+            # for key, product in self._registry.items():
+            #     for item in product._registry:
+            #         print(item)
+            cont = utils.select_yn("Were other products purchased in this transaction?")
+
+    def collect_dicts(self):
+        dicts = []
+        for name, product in self._registry.items():
+            dicts += product.collect_dicts()
+        return dicts
+
+    def tabulate(self):
+        all_table = QTable(self.collect_dicts())
+        if isinstance(self.input_dir, str):
+            all_table.write(os.path.join(self.input_dir, f"{self.name}.ecsv"))
+            all_table.write(os.path.join(self.input_dir, f"{self.name}.csv"))
+        return all_table
+
+    def _generate_id(self):
+        return self.name
+
+
+
                     

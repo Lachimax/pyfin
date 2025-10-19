@@ -35,8 +35,17 @@ class ETFUnit(Contained):
         return self.value_at_maturation() - self.purchased_for()
 
     def _generate_id(self, n):
-        return f"{self.container.code}_{self.purchased}_{n}"
+        return f"{self.container.code}_{self.purchased.strftime("%Y-%m-%d")}_{n}"
         
+    def to_dict(self):
+        dictionary = super().to_dict()
+        dictionary.update({
+            "maturation_date": self.maturation(),
+            "mature_value": self.value_at_maturation(),
+            "mature_return": self.return_at_maturation()
+        })
+        return dictionary
+
     @classmethod
     def _container_class(cls):
         from pyfin.portfolio import Portfolio

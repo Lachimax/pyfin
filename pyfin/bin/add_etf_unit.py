@@ -23,9 +23,10 @@ def main(
     portfolio.load_etfs()
     cont = True
     while cont:
-        portfolio.add_etf_unit_ui()
-        cont = utils.select_yn("Add another?")
+        portfolio.add_etf_units_ui()
+        cont = utils.select_yn("Add another transaction?")
     portfolio.write_etfs()
+    portfolio.tabulate()
 
 def parse_args():
     import argparse

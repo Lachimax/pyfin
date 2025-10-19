@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 from astropy import units as u
@@ -98,5 +100,7 @@ class ETFProduct(Simulated, Container):
     def add_item(self, item):
         if item.price is not None and item.purchased is not None:
             self.add_record(date=item.purchased, value=item.price)
+        if self.container is not None and isinstance(self.container.path, str):
+            item.path = os.path.join(self.container.unit_directory, self.id, item.id + ".yaml")
         super().add_item(item)
         

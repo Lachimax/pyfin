@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from .contained import Contained
 
 import astropy.units as u
+from astropy.table import QTable
 
 from .generic import Generic
 
@@ -36,6 +37,16 @@ class Container(Generic):
 
     def list_items(self):
         return list(sorted(self._registry.keys()))
+
+    def collect_dicts(self):
+        dicts = []
+        for key, item in self._registry.items():
+            dictionary = item.to_dict()
+            dicts.append(dictionary)
+        return dicts
+
+    def tabulate(self):
+        return QTable(dicts)
 
     def __getitem__(self, name):
         return self._registry[name]
