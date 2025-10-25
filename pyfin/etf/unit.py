@@ -39,10 +39,15 @@ class ETFUnit(Contained):
         
     def to_dict(self):
         dictionary = super().to_dict()
+
+        mature_return = self.return_at_maturation()
+
         dictionary.update({
-            "maturation_date": self.maturation(),
+            "purchased": self.purchased.strftime("%Y-%m-%d"),
+            "maturation_date": self.maturation().strftime("%Y-%m-%d"),
             "mature_value": self.value_at_maturation(),
-            "mature_return": self.return_at_maturation()
+            "mature_return": mature_return,
+            "mature_return_frac": mature_return / self.price
         })
         return dictionary
 

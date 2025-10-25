@@ -34,10 +34,12 @@ def read_yaml(file: str) -> dict:
     Returns:
         dict: the YAML contents, represented asa dictionary.
     """
+    # print("Loading file", file)
     if os.path.isfile(file):
         with open(file) as f:
             p = yaml.load(f)
     else:
+        # print("\tNo file found at", file)
         p = None
     return p
 

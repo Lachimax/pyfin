@@ -97,8 +97,8 @@ class Portfolio(Simulation):
     def tabulate(self):
         all_table = QTable(self.collect_dicts())
         if isinstance(self.input_dir, str):
-            all_table.write(os.path.join(self.input_dir, f"{self.name}.ecsv"))
-            all_table.write(os.path.join(self.input_dir, f"{self.name}.csv"))
+            all_table.write(os.path.join(self.input_dir, f"{self.name}.ecsv"), overwrite=True)
+            all_table.write(os.path.join(self.input_dir, f"{self.name}.csv"), overwrite=True)
         return all_table
 
     def _generate_id(self):
