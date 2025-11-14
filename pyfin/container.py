@@ -45,8 +45,14 @@ class Container(Generic):
             dicts.append(dictionary)
         return dicts
 
+    def print_items(self):
+        for item in self.list_items():
+            print(item)
+
     def tabulate(self):
-        return QTable(dicts)
+        table = QTable(self.collect_dicts())
+        table.sort("id")
+        return table
 
     def __getitem__(self, name):
         return self._registry[name]

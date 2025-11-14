@@ -49,8 +49,16 @@ class Portfolio(Simulation):
             for idn, unit in product._registry.items():
                 unit.to_file()
 
+    def print_etfs(self):
+        for name, product in self._registry.items():
+            print("=" * 20)
+            print(name)
+            product.print_items()
+            print()
+
 
     def add_etf_units_ui(self):
+        self.print_etfs()
         purchased = utils.enter_time(
             message="Enter date of transaction:"
         )
@@ -96,6 +104,7 @@ class Portfolio(Simulation):
 
     def tabulate(self):
         all_table = QTable(self.collect_dicts())
+        all_table.sort("id")
         if isinstance(self.input_dir, str):
             all_table.write(os.path.join(self.input_dir, f"{self.name}.ecsv"), overwrite=True)
             all_table.write(os.path.join(self.input_dir, f"{self.name}.csv"), overwrite=True)

@@ -94,6 +94,8 @@ class Generic():
             Generic: object created from the file.
         """
         params = utils.read_yaml(file=file)
+        if not isinstance(params, dict):
+            raise FileNotFoundError(f"{file} is not a valid YAML file.")
         for k in cls.date_keys:
             if k in params:
                 params[k] = t.Time(params[k])

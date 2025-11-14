@@ -1,3 +1,5 @@
+from astropy.time import Time
+
 from pyfin.contained import Contained
 
 class ETFUnit(Contained):
@@ -31,8 +33,14 @@ class ETFUnit(Contained):
     def value_at_maturation(self):
         return self.container.value_at_date(self.maturation())
 
+    def value_today(self):
+        return self.container.value_at_date(Time.now())
+
     def return_at_maturation(self):
         return self.value_at_maturation() - self.purchased_for()
+
+    def return_today(self):
+        return self.value_today() - self.purchased_for()
 
     def _generate_id(self, n):
         return f"{self.container.code}_{self.purchased.strftime("%Y-%m-%d")}_{n}"
@@ -41,13 +49,17 @@ class ETFUnit(Contained):
         dictionary = super().to_dict()
 
         mature_return = self.return_at_maturation()
+        return_to_date = self.return_today()
 
         dictionary.update({
             "purchased": self.purchased.strftime("%Y-%m-%d"),
             "maturation_date": self.maturation().strftime("%Y-%m-%d"),
             "mature_value": self.value_at_maturation(),
             "mature_return": mature_return,
-            "mature_return_frac": mature_return / self.price
+            "mature_return_frac": mature_return / self.price,
+            "held_for": (Time.now() - self.purchased).to("yr"),
+            "return_to_date": return_to_date,
+            "return_to_date_frac": return_to_date / self.price,
         })
         return dictionary
 

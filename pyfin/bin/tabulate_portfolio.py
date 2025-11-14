@@ -23,11 +23,6 @@ def main(
         print(f"No file {path} found. Make sure you're providing the correct path using -f.")
         exit()
     portfolio.load_etfs()
-    cont = True
-    while cont:
-        portfolio.add_etf_units_ui()
-        cont = utils.select_yn("Add another transaction?")
-    portfolio.write_etfs()
     portfolio.tabulate()
 
 def parse_args():
