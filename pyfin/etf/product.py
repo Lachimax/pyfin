@@ -5,9 +5,9 @@ import numpy as np
 from astropy import units as u
 from astropy import time as t
 
-from pyfin.utils import dollar
-from pyfin.simulated import Simulated
-from pyfin.container import Container
+from ..utils import dollar
+from ..simulated import Simulated
+from ..container import Container
 from .unit import ETFUnit
 
 
@@ -94,7 +94,7 @@ class ETFProduct(Simulated, Container):
 
     @classmethod
     def _container_class(cls):
-        from pyfin.portfolio import Portfolio
+        from ..portfolio import Portfolio
         return Portfolio
     
     def add_item(self, item):

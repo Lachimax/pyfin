@@ -1,6 +1,8 @@
 from astropy.time import Time
 
-from pyfin.contained import Contained
+from ..contained import Contained
+from ..utils import dollar
+
 
 class ETFUnit(Contained):
     params = {
@@ -31,10 +33,10 @@ class ETFUnit(Contained):
         return self.purchased + self.container.suggested_term
 
     def value_at_maturation(self):
-        return self.container.value_at_date(self.maturation())
+        return self.container.value_at_date(self.maturation()).round(2)
 
     def value_today(self):
-        return self.container.value_at_date(Time.now())
+        return self.container.value_at_date(Time.now()).round(2)
 
     def return_at_maturation(self):
         return self.value_at_maturation() - self.purchased_for()
@@ -50,9 +52,9 @@ class ETFUnit(Contained):
 
         mature_return = self.return_at_maturation()
         return_to_date = self.return_today()
-
         dictionary.update({
             "purchased": self.purchased.strftime("%Y-%m-%d"),
+            "present_value": self.value_today(),
             "maturation_date": self.maturation().strftime("%Y-%m-%d"),
             "mature_value": self.value_at_maturation(),
             "mature_return": mature_return,
@@ -65,5 +67,5 @@ class ETFUnit(Contained):
 
     @classmethod
     def _container_class(cls):
-        from pyfin.portfolio import Portfolio
+        from ..portfolio import Portfolio
         return Portfolio

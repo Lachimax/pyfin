@@ -7,12 +7,12 @@ from astropy import units, time
 from astropy.table import QTable
 
 from .sim import Simulation
-from pyfin.etf.product import ETFProduct
-from pyfin.etf.unit import ETFUnit
-from pyfin import utils
+from .etf.product import ETFProduct
+from .etf.unit import ETFUnit
+from . import utils
 from astropy.table import vstack
 if TYPE_CHECKING:
-    from pyfin.container import Container
+    from .container import Container
 
 class Portfolio(Simulation):
     """The Portfolio actually contains only products, which themselves contain the units that make up a portfolio.
@@ -21,6 +21,8 @@ class Portfolio(Simulation):
         super().__init__(path, **kwargs)
         self.product_directory = os.path.join(self.input_dir, "etf", "products")
         self.unit_directory = os.path.join(self.input_dir, "etf", "units")
+        self.invested = 0. * utils.dollar
+        self.value = 0. * utils.dollar
 
         
     def load_etfs(self):
@@ -43,6 +45,8 @@ class Portfolio(Simulation):
 
         print()
 
+    def returns(self):
+        return self.value - self.invested
 
     def write_etfs(self):
         for key, product in self._registry.items():
@@ -104,10 +108,19 @@ class Portfolio(Simulation):
 
     def tabulate(self):
         all_table = QTable(self.collect_dicts())
+        all_table.remove_column("verbose")
         all_table.sort("id")
+        self.invested = all_table["price"].sum()
+        self.value = all_table["present_value"].sum()
+        print("Total invested:", self.invested)
+        print("Total present value:", self.value)
+        print("Total present return:", self.returns())
         if isinstance(self.input_dir, str):
             all_table.write(os.path.join(self.input_dir, f"{self.name}.ecsv"), overwrite=True)
             all_table.write(os.path.join(self.input_dir, f"{self.name}.csv"), overwrite=True)
+
+
+
         return all_table
 
     def _generate_id(self):
