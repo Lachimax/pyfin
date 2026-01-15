@@ -15,6 +15,8 @@ license = { file = "LICENSE.md" }
 description = "."
 readme = "README.md"
 [project.scripts]
+add_etf_unit = "pyfin.bin.add_etf_unit:parse_args"
 new_etf_product = "pyfin.bin.new_etf_product:parse_args"
 new_portfolio = "pyfin.bin.new_portfolio:parse_args"
 run_sim = "pyfin.bin.run_sim:parse_args"
+tabulate_portfolio = "pyfin.bin.tabulate_portfolio:parse_args"

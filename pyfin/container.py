@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from .contained import Contained
 
 import astropy.units as u
+from astropy.table import QTable
 
 from .generic import Generic
 
@@ -33,6 +34,25 @@ class Container(Generic):
             bool: ID in registry?
         """
         return idn in self._registry
+
+    def list_items(self):
+        return list(sorted(self._registry.keys()))
+
+    def collect_dicts(self):
+        dicts = []
+        for key, item in self._registry.items():
+            dictionary = item.to_dict()
+            dicts.append(dictionary)
+        return dicts
+
+    def print_items(self):
+        for item in self.list_items():
+            print(item)
+
+    def tabulate(self):
+        table = QTable(self.collect_dicts())
+        table.sort("id")
+        return table
 
     def __getitem__(self, name):
         return self._registry[name]

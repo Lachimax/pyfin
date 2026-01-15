@@ -3,7 +3,7 @@ Code for modelling personal finances. Mainly for fun - does not constitute finan
 
 ```bash
 conda env create -f environment.yaml
-conda activate template
+conda activate finance
 ```
 
 ```bash
