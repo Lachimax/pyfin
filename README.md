@@ -1,4 +1,4 @@
-# finance
+# pyfin
 Code for modelling personal finances. Mainly for fun - does not constitute financial advice on any level.
 
 ```bash
