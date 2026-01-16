@@ -16,17 +16,20 @@ import os
 
 def main(
         path: str,
+        path_csv: str
 ):
     try:
         portfolio = Portfolio.from_file(path)
     except FileNotFoundError:
-        print(f"No file {path} found. Make sure you're providing the correct path using -f.")
+        print(f"No file {path} found. Make sure you're providing the correct Portfolio path using -f.")
         exit()
     portfolio.load_etfs()
-    cont = True
-    while cont:
-        portfolio.add_etf_units_ui()
-        cont = utils.select_yn("Add another transaction?")
+    try:
+        portfolio.add_etf_units_csv(path_csv, skip_existing=True)
+    except FileNotFoundError:
+        print(f"No file {path_csv} found. Make sure you're providing the correct CSV path using -c.")
+        exit()
+        
     portfolio.write_etfs()
     portfolio.tabulate()
 
@@ -42,10 +45,17 @@ def parse_args():
         type=str,
         default="./main.yaml"
     )
+    
+    parser.add_argument(
+        "-c",
+        help="Path to CSV file.",
+        type=str,
+    )
 
     args = parser.parse_args()
     main(
         path=args.f,
+        path_csv=args.c,
     )
 
 

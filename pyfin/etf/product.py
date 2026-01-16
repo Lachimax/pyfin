@@ -32,6 +32,13 @@ class ETFProduct(Simulated, Container):
 
     def generate_id(self, **kwargs):
         return self.code
+    
+    def check_for_unit(self, purchased: t.Time):
+        matching = []
+        for idn, unit in self._registry.items():
+            if unit.purchased == purchased:
+                matching.append(unit)
+        return matching
 
     def value_at_date(self, date: t.Time):
         recorded_dates = list(sorted(self.record.keys(), key=lambda k: date - k))
@@ -86,11 +93,6 @@ class ETFProduct(Simulated, Container):
 
     def add_record(self, date: t.Time, **kwargs):
         self.record[date] = kwargs
-
-    def new_unit(self, purchased: t.Time):
-        unit = ETFUnit(product=self, purchased=purchased, container=self.container)
-        self.container.add_item(unit)
-        return unit
 
     @classmethod
     def _container_class(cls):

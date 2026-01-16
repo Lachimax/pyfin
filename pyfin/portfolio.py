@@ -60,6 +60,48 @@ class Portfolio(Simulation):
             product.print_items()
             print()
 
+    def add_etf_units_csv(self, path: str, skip_existing: bool = True):
+        """Import ETF purchases from a Vanguard transactions CSV.
+
+        Args:
+            path (str): Path of file.
+        """
+        
+        tbl = QTable.read(path, format="csv")
+        added = []
+        for row in tbl:
+            print(row)
+            product_name = row["Product ID"]
+            if product_name not in self._registry:
+                raise ValueError(f"Product {product_name} not found in portfolio.")
+            
+            n = int(row["Quantity"])
+            product = self[product_name]
+            purchased = time.Time.strptime(row["Trade Date"], r"%d-%b-%Y")
+            price = float(row["Unit Price"])
+            
+            # Check for duplicates
+            if skip_existing:
+                matching = product.check_for_unit(purchased)
+                if len(matching) >= n:
+                    print(f"Skipping {n} units of {product_name} purchased on {purchased.strftime('%Y-%m-%d')} as {len(matching)} already exist.")
+            
+                n = n - len(matching)
+            
+            for i in range(n):
+                etf_unit = ETFUnit(
+                    container=product,
+                    purchased=purchased,
+                    price=price * utils.dollar
+                )
+                product.add_item(etf_unit)
+                added.append(product_name)
+                
+        added.sort()
+        print(f"\nAdded {len(added)} ETF units:")
+        for p in added:
+            print(p)
+
 
     def add_etf_units_ui(self):
         self.print_etfs()
@@ -93,6 +135,7 @@ class Portfolio(Simulation):
                 product.add_item(etf_unit)
                 added.append(product_name)
             added.sort()
+            print(f"Added {len(added)} ETF units:")
             for p in added:
                 print(p)
             # for key, product in self._registry.items():
