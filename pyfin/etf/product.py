@@ -91,7 +91,14 @@ class ETFProduct(Simulated, Container):
         self.add_record(date=date, **step_props)
         return step_props
 
+    def last_record(self):
+        last_date = max(self.record.keys())
+        return last_date, self.record[last_date]
+
     def add_record(self, date: t.Time, **kwargs):
+        last_date, _ = self.last_record()
+        if date > last_date:
+            self.value = kwargs["value"]
         self.record[date] = kwargs
 
     @classmethod

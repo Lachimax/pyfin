@@ -11,6 +11,7 @@ from astropy.units import yr
 from pyfin.portfolio import Portfolio
 from pyfin import utils
 
+import os
 
 
 def main(
@@ -19,15 +20,15 @@ def main(
     try:
         portfolio = Portfolio.from_file(path)
     except FileNotFoundError:
-        print(f"No file {path} found. Make sure you're providing the correct path using -f.")
+        print(f"No file {path} found. Make sure you're providing the correct Portfolio path using -f.")
         exit()
     portfolio.load_etfs()
-    cont = True
-    while cont:
-        portfolio.add_etf_units_ui()
-        cont = utils.select_yn("Add another transaction?")
+    portfolio.update_etf_values_ui()
     portfolio.write_etfs()
     portfolio.tabulate()
+    # This currently doesn't save the new value in any meaningful way (the ETF units have it, but that will get wiped the next time it loads.)
+    # Need a way of saving records to get loaded.
+    
 
 def parse_args():
     import argparse

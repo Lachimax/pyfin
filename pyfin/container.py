@@ -20,7 +20,8 @@ class Container(Generic):
         super().__init__(path, **kwargs)
 
     def add_item(self, item: Contained):
-        item.set_id()
+        if item.id is None:
+            item.set_id()
         self[item.id] = item
         item.container = self
 

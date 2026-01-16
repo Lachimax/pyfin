@@ -26,6 +26,7 @@ class Generic():
             setattr(self, key, item)
         if self.id is None:
             self.set_id()
+
         # Default to name of object as filename if a directory is provided as path
         if self.path is not None and os.path.isdir(self.path) and self.name is not None:
             self.path = os.path.join(self.path, self.name + self.id + ".yaml")

@@ -26,7 +26,7 @@ class Portfolio(Simulation):
 
         
     def load_etfs(self):
-        for file in os.listdir(self.product_directory):
+        for file in sorted(os.listdir(self.product_directory)):
             path = os.path.join(self.product_directory, file)
             if os.path.isfile(path) and "template" not in file:
                 self.message("Loading ETF Product from", path)
@@ -35,7 +35,7 @@ class Portfolio(Simulation):
         for product_name in os.listdir(self.unit_directory): # Directories containing unit files
             directory = os.path.join(self.unit_directory, product_name)
             self.message("Product units for", product_name, "from", directory)
-            for file in os.listdir(directory): # Unit files
+            for file in sorted(os.listdir(directory)): # Unit files
                 path = os.path.join(directory, file)
                 if os.path.isfile(path) and "template" not in file:
                     self.message("\tLoading ETF Unit from", path)
@@ -70,7 +70,7 @@ class Portfolio(Simulation):
         tbl = QTable.read(path, format="csv")
         added = []
         for row in tbl:
-            print(row)
+            print("\n", row)
             product_name = row["Product ID"]
             if product_name not in self._registry:
                 raise ValueError(f"Product {product_name} not found in portfolio.")
@@ -95,7 +95,8 @@ class Portfolio(Simulation):
                     price=price * utils.dollar
                 )
                 product.add_item(etf_unit)
-                added.append(product_name)
+                added.append(etf_unit.id)
+                print(f"\tAdded {product_name} unit {i + 1} of {n} ({etf_unit.id})")
                 
         added.sort()
         print(f"\nAdded {len(added)} ETF units:")
@@ -133,7 +134,7 @@ class Portfolio(Simulation):
                 )
                 i += 1
                 product.add_item(etf_unit)
-                added.append(product_name)
+                added.append(etf_unit.id)
             added.sort()
             print(f"Added {len(added)} ETF units:")
             for p in added:
@@ -142,6 +143,18 @@ class Portfolio(Simulation):
             #     for item in product._registry:
             #         print(item)
             cont = utils.select_yn("Were other products purchased in this transaction?")
+
+    def update_etf_values_ui(self):
+        for name, product in self._registry.items():
+            if utils.select_yn(f"Update value for product {name}?"):
+                new_value = utils.user_input(
+                    message=f"Enter new value for unit {name} (currently {product.value.round(2)}):",
+                    input_type=float
+                )
+                product.value = new_value * utils.dollar
+                product.add_record(date=time.Time.now(), value=product.value)
+                print(f"\tUpdated value to {product.value.round(2)}")
+                # product.to_file()
 
     def collect_dicts(self):
         dicts = []
