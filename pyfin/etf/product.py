@@ -1,38 +1,32 @@
 import os
 
-import numpy as np
-
 from astropy import units as u
 from astropy import time as t
 
-from ..utils import dollar
-from ..simulated import Simulated
+from ..appreciable import Appreciable
 from ..container import Container
-from .unit import ETFUnit
 
 
-class ETFProduct(Simulated, Container):
-    params = {
-        "code": "",
-        "provider": "Vanguard",
-        "suggested_term": 3 * u.yr,
-        "predicted_annual_growth": 0.06,
-        "starting_value": 50. * dollar,
-        "start_date": t.Time.now(),
-        "management_fee": 0.0027
-    }
+class ETFProduct(Appreciable, Container):
+    params = Appreciable.params.update(
+        {
+            "code": "",
+            "provider": "Vanguard",
+            "suggested_term": 3 * u.yr,
+            "management_fee": 0.0027
+        }
+    )
     _container_key = "portfolio"
     date_keys = ["start_date"]
     money_keys = ["starting_value"]
 
     def __init__(self, path, **kwargs):
         super().__init__(path, **kwargs)
-        self.value: float = self.starting_value * 1.
-        self.record[self.start_date] = {"value": self.starting_value}
+
 
     def generate_id(self, **kwargs):
         return self.code
-    
+
     def check_for_unit(self, purchased: t.Time):
         matching = []
         for idn, unit in self._registry.items():
@@ -51,40 +45,37 @@ class ETFProduct(Simulated, Container):
             latest = closest
             sandwiched = False
         if sandwiched:
-            return self.record[closest]["value"] # TODO: Maybe interpolate
+            return self.record[closest]["value"]  # TODO: Maybe interpolate
         else:
             delta = date - latest
             delta = delta.to(u.yr)
             last_value = self.record[latest]["value"]
-            new_value, _ = self.predict_growth(delta_time=delta, initial_value=last_value)
+            new_value, _ = self.appreciate(delta_time=delta, initial_value=last_value)
             return new_value
 
-    def predict_growth(
+    def appreciate(
             self,
             delta_time: u.Quantity,
             initial_value: float = None
     ):
-        if initial_value is None:
-            initial_value = self.value
-        # Calculate growth
-        new_value = initial_value * (1 + self.predicted_annual_growth) ** (delta_time / u.yr)
+        new_value = super().appreciate(delta_time=delta_time, initial_value=initial_value)
         # Calculate management fee
         fee = ((1 - self.management_fee) ** (delta_time / u.yr) - 1) * new_value
         new_value = new_value - fee
         return new_value, fee
 
-
     def step(
             self,
             step_size: u.Quantity = 1 * u.fortnight,
     ):
-        step_props = super().step(step_size)
-        new_value, fee = self.predict_growth(delta_time=step_size)
+        step_props = super().step(step_size=step_size)
+        new_value, fee = self.appreciate(delta_time=step_size)
         old_value = self.value * 1.
         self.value = new_value
         # print(new_value, old_value)
         delta_value = new_value - old_value
-        self.message(f"\t{self.id}: Value changes by {delta_value} (fees {fee}), {old_value.round(2)} -> {self.value.round(2)}")
+        self.message(
+            f"\t{self.id}: Value changes by {delta_value} (fees {fee}), {old_value.round(2)} -> {self.value.round(2)}")
         step_props["value"] = self.value
         step_props["value_change"] = delta_value
         date = step_props.pop("date")
@@ -105,11 +96,10 @@ class ETFProduct(Simulated, Container):
     def _container_class(cls):
         from ..portfolio import Portfolio
         return Portfolio
-    
+
     def add_item(self, item):
         if item.price is not None and item.purchased is not None:
             self.add_record(date=item.purchased, value=item.price)
         if self.container is not None and isinstance(self.container.path, str):
             item.path = os.path.join(self.container.unit_directory, self.id, item.id + ".yaml")
         super().add_item(item)
-        

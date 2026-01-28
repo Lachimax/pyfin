@@ -10,7 +10,6 @@ from .sim import Simulation
 from .etf.product import ETFProduct
 from .etf.unit import ETFUnit
 from . import utils
-from astropy.table import vstack
 if TYPE_CHECKING:
     from .container import Container
 
